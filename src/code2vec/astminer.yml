@@ -1,0 +1,12 @@
+inputDir: /astminer/files
+outputDir: /astminer/files/output
+parser:
+  name: antlr
+  languages: [py]
+label:
+  name: file name
+storage:
+  name: code2vec
+  maxPathLength: 30
+  maxPathWidth: 15
+  maxPathContextsPerEntity: 300
