@@ -1,0 +1,3 @@
+[submodule "external/code2vec"]
+	path = external/code2vec
+	url = https://github.com/tech-srl/code2vec
