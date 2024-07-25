@@ -84,7 +84,8 @@ def preprocess(tree, removals=[]):
             tree = update
     return tree
 
-def graph(tree, removals=[]):
+def graph(code, removals=[]):
+    tree = ast.parse(code)
     tree = preprocess(tree, removals + ["Load", "Store", "alias", "Import", "ImportFrom"])
     visitor = GraphVisitor()
     visitor.visit(tree)
@@ -130,25 +131,24 @@ def adjacency(edges, nodes):
 def vector(adjacency):
     return adjacency.reshape((len(adjacency) ** 2,))
 
-def vectorize(snippets, as_markov, as_graph=graph):
+def vectorize(codes, graph, markov):
     chains = []
     nodes = set()
     done = 1
-    for snippet in snippets:
+    for code in codes:
         if not done % 500:
             print(f'Processed {done} snippets...')
-        done += 1
-        vertices, edges = as_graph(ast.parse(snippet))
-        vertices, edges = as_markov(vertices, edges)
+        vertices, edges = graph(code)
+        vertices, edges = markov(vertices, edges)
         chains.append(edges)
-        nodes = nodes.union(vertices)
+        nodes |= vertices
+        done += 1
     nodes = sorted(list(nodes))
-    print(f'Dims: {len(nodes)}')
     yield nodes
     done = 1
     for edges in chains:
         if not done % 100:
             print(f'Vectorized {done} chains...')
-        done += 1
         matrix = adjacency(edges, nodes)
         yield vector(matrix)
+        done += 1
